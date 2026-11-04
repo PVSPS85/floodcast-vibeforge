@@ -31,8 +31,8 @@ def load_and_preprocess_data(
     Step 1: Load train and test data, parse dates, cast station_id to string.
     """
     print(f"Loading data from {train_path} and {test_path}...")
-    train_df = pd.read_csv(train_path, encoding="utf-8")
-    test_df = pd.read_csv(test_path, encoding="utf-8")
+    train_df = pd.read_csv(train_path, dtype={"station_id": str}, encoding="utf-8")
+    test_df = pd.read_csv(test_path, dtype={"station_id": str}, encoding="utf-8")
 
     # Parse date as datetime
     train_df["date"] = pd.to_datetime(train_df["date"])
@@ -94,7 +94,8 @@ def create_features(
     """
     Engineers temporal and hydrological antecedent features across continuous timeseries.
     """
-    # Combine temporarily to compute continuous temporal and lag features
+    # Tag original test order to ensure exact row-by-row alignment
+    test_df["_orig_idx"] = np.arange(len(test_df))
     train_df["_is_test"] = False
     test_df["_is_test"] = True
     combined = pd.concat([train_df, test_df], ignore_index=True)
@@ -140,17 +141,28 @@ def create_features(
     ]
 
     # Split back into train and test
-    processed_train = combined[~combined["_is_test"]].drop(columns=["_is_test"]).copy()
+    processed_train = (
+        combined[~combined["_is_test"]]
+        .drop(columns=["_is_test", "_orig_idx"], errors="ignore")
+        .copy()
+    )
     processed_test = combined[combined["_is_test"]].drop(columns=["_is_test"]).copy()
 
-    # Re-sort to maintain clean order
+    # Re-sort to maintain clean order; restore processed_test to original row sequence
     processed_train = processed_train.sort_values(by=["station_id", "date"]).reset_index(drop=True)
-    processed_test = processed_test.sort_values(by=["station_id", "date"]).reset_index(drop=True)
+    processed_test = (
+        processed_test.sort_values(by="_orig_idx")
+        .drop(columns=["_orig_idx"])
+        .reset_index(drop=True)
+    )
 
     return processed_train, processed_test, feature_cols
 
 
 def main() -> None:
+    # Retain the original unmodified test_df to guarantee exact row-by-row alignment
+    original_test_df = pd.read_csv("data/test.csv", dtype={"station_id": str}, encoding="utf-8")
+
     # 1. Load data
     train_df, test_df = load_and_preprocess_data()
 
@@ -236,11 +248,11 @@ def main() -> None:
     assert np.all(test_preds >= 0.0), "Predictions contain negative values!"
     print(f"Assertions passed: {len(test_preds)} valid, non-negative predictions generated.")
 
-    # 7. Output result to predictions.csv
+    # 7. Output result to predictions.csv directly assigning columns from original_test_df
     output_path = Path("predictions.csv")
     predictions_df = pd.DataFrame({
-        "station_id": test_df["station_id"],
-        "date": test_df["date"].dt.strftime("%Y-%m-%d"),
+        "station_id": original_test_df["station_id"],
+        "date": original_test_df["date"],
         "discharge_cfs": np.round(test_preds, 2),
     })
 
