@@ -1,1 +1,4 @@
 
+station_id,station_name,latitude,longitude,state
+ST-001,River Alpha,45.0,-120.0,WA
+ST-002,River Beta,44.0,-121.0,OR
