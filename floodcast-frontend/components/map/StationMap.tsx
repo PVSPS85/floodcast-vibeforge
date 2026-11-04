@@ -39,10 +39,10 @@ export const StationMap: React.FC = () => {
       >
         <MapPanController targetLat={selectedStation.lat} targetLon={selectedStation.lon} />
 
-        {/* CartoDB Dark Matter Basemap */}
+        {/* Esri Dark Gray Base Map (Free, No API Key Required) */}
         <TileLayer
-          attribution='&copy; <a href="https://carto.com/">CARTO</a> &bull; USGS NWIS'
-          url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+          attribution='&copy; <a href="https://www.esri.com/">Esri</a> &mdash; Esri, DeLorme, NAVTEQ'
+          url="https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}"
         />
 
         {stations.map((station) => {
@@ -127,4 +127,3 @@ export const StationMap: React.FC = () => {
   );
 };
 export default StationMap;
-
