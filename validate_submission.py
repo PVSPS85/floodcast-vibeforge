@@ -101,6 +101,3 @@ def validate_predictions():
 
 if __name__ == "__main__":
     validate_predictions()
-```[cite: 4, 6]
-
----
