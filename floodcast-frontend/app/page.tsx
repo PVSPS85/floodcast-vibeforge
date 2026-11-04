@@ -68,12 +68,12 @@ export default function DashboardPage() {
       {/* Primary Dashboard Grid: Map + Hydrograph */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
         {/* Left Column: Leaflet Map */}
-        <div className="lg:col-span-5 h-[480px]">
+        <div className="lg:col-span-5 min-h-[520px] flex flex-col">
           <DynamicMap />
         </div>
 
         {/* Right Column: Hydrograph Cause-Effect Chart */}
-        <div className="lg:col-span-7 h-[480px]">
+        <div className="lg:col-span-7 min-h-[520px] flex flex-col">
           <CauseEffectChart />
         </div>
       </div>
@@ -95,4 +95,3 @@ export default function DashboardPage() {
     </MainLayout>
   );
 }
-
