@@ -1,1 +1,16 @@
+# Data directories & CSV files (except submission templates)
+data/
+*.csv
+!sample_submission.csv
 
+# Python environments & build artifacts
+venv/
+.venv/
+env/
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+
+# System files
+.DS_Store
+Thumbs.db
