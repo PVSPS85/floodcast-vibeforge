@@ -1,6 +1,11 @@
-
 catboost_info/
 **/__pycache__/
 *.pyc
 
 predictions.csv
+
+# Node & Next.js
+**/node_modules/
+**/.next/
+**/.pnp
+**/.pnp.js
