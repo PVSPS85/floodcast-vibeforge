@@ -9,9 +9,17 @@
 
 ---
 
-## 📌 Executive Summary
+## 👥 Team Information
+* **Team Name:** Team VibeForge
+* **Team Members:**
+  * **Harshith Varanasi** (Lead Developer & Machine Learning Engineer) — [@PVSPS85](https://github.com/PVSPS85)
+  * **Team VibeForge Collaborators**
 
-**Floodcast** is an end-to-end hydrological machine learning and decision-support dashboard designed to anticipate extreme river discharge and flash flood events across the continental United States. Our approach leverages an extreme-weighted **CatBoost Regressor** trained on 12 years of real-time streamflow observations from the **USGS National Water Information System (NWIS)**, antecedent weather signals from **Open-Meteo Historical Archive** (precipitation pulses, daily temperature swings, and root-zone soil moisture), and static catchment physiographic drivers from **USGS StreamStats**. By applying a custom 2.5× sample weighting scheme on the top 15% highest peak discharge events, our model specifically counters severe-event underprediction in power-law river basins while strictly respecting physical non-negative flow constraints. The interactive Next.js command dashboard visualizes live cause-and-effect hydrographs, National Weather Service flood stage alerts, and geographic gauge telemetry across 50 major US river basins.
+---
+
+## 📌 Approach Summary (Executive Overview)
+
+**Floodcast** is an end-to-end hydrological machine learning and decision-support dashboard designed to anticipate extreme river discharge and flash flood events across the continental United States. Our approach leverages an extreme-weighted **CatBoost Regressor** trained on 12 years of real-time streamflow observations from the **USGS National Water Information System (NWIS)**, antecedent weather signals from the **Open-Meteo Historical Archive** (precipitation pulses, daily temperature swings, and root-zone soil moisture), and static catchment physiographic drivers from **USGS StreamStats**. By applying a custom 2.5× sample weighting scheme on the top 15% highest peak discharge events, our model specifically counters severe-event underprediction in power-law river basins while strictly respecting physical non-negative flow constraints. The interactive Next.js command dashboard visualizes live cause-and-effect hydrographs, National Weather Service flood stage alerts, and geographic gauge telemetry across 50 major US river basins.
 
 ---
 
@@ -34,7 +42,7 @@
 
 ---
 
-## 🚀 Quickstart & Setup Guide
+## 🚀 How to Run the Code
 
 ### 1. Prerequisites
 * **Python**: 3.10+ (Recommended: Python 3.11)
@@ -70,6 +78,9 @@ python solution.py
 
 # Verify submission compliance and data alignment (all 7 integrity tests)
 python validate_submission.py
+
+# Run full hackathon judging criteria audit (all 10/10 compliance rules)
+python scripts/test_judging_criteria.py
 ```
 
 #### (Optional) Run the FastAPI Telemetry Server:
@@ -109,9 +120,17 @@ npm run start
 
 ```
 floodcast-vibeforge/
+├── README.md                            # Hackathon overview, team, tech stack, and instructions
+├── requirements.txt                     # Pinned Python package dependencies
+├── solution.py                          # Self-contained end-to-end model training script
+├── predictions.csv                      # Output predictions for test.csv (36,500 rows)
+├── model_card.md                        # Model card specifications and evaluation report
 ├── data/                                # Benchmark datasets
 │   ├── train.csv                        # 219,150 historical observations (2010-2021)
 │   └── test.csv                         # 36,500 test period records (2022-2023)
+├── presentations/                       # 5-Slide Presentation Deck
+│   ├── floodcast_presentation.pdf       # Formal 5-slide PDF presentation deck
+│   └── floodcast_presentation.md        # Slide deck content and speaker notes
 ├── src/                                 # Core ML & data library
 │   ├── data_loader.py                   # Clean multi-station ingestion & time-safe imputations
 │   ├── features.py                      # 19 hydrological features (rolling rainfall, lags, proxy volumes)
@@ -134,13 +153,8 @@ floodcast-vibeforge/
 ├── notebooks/                           # Exploratory Data Analysis & Hydrographs
 │   ├── 01_eda_and_hydrographs.ipynb
 │   └── 02_model_benchmarking.ipynb
-├── presentations/                       # Hackathon pitch assets
-│   └── floodcast_presentation.pdf
 ├── fetch_batch_data.py                  # Multi-station NWIS & Open-Meteo harvester
-├── solution.py                          # Self-contained end-to-end model training script
 ├── validate_submission.py               # Official submission compliance validator
-├── model_card.md                        # Model card specifications and evaluation report
-├── requirements.txt                     # Pinned Python package dependencies
 └── Dockerfile                           # Containerized reproducible execution environment
 ```
 
@@ -169,9 +183,3 @@ RUNNING SUBMISSION INTEGRITY CHECKS: predictions.csv
 >>> FINAL RESULT: ALL INTEGRITY CHECKS PASSED. READY FOR SUBMISSION. <<<
 =================================================================
 ```
-
----
-
-## 👥 Team VibeForge
-* Built for the **Floodcast Hackathon**.
-* Dedicated to advancing data-driven flood risk intelligence and community climate resilience.
