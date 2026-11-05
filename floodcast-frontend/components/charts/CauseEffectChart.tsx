@@ -82,7 +82,7 @@ export const CauseEffectChart: React.FC = () => {
       initial={{ opacity: 0, y: 15 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4 }}
-      className="rounded-2xl border border-slate-800/80 bg-slate-900/70 p-5 backdrop-blur-md shadow-xl flex flex-col justify-between"
+      className="rounded-2xl border border-slate-800/80 bg-slate-900/70 p-5 backdrop-blur-md shadow-xl flex flex-col justify-between h-full"
     >
       {/* Header with Title and Range Picker */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
@@ -121,7 +121,7 @@ export const CauseEffectChart: React.FC = () => {
       </div>
 
       {/* Chart Canvas */}
-      <div className="h-[360px] w-full">
+      <div className="flex-1 min-h-[380px] w-full">
         {isLoadingTimeseries ? (
           <div className="flex h-full w-full items-center justify-center text-xs text-slate-500">
             Refreshing Hydrograph...

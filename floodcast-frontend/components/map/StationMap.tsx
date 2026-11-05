@@ -84,9 +84,9 @@ export const StationMap: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col h-full w-full space-y-2.5">
+    <div className="flex flex-col h-full w-full space-y-2.5 flex-1">
       {/* NWS Professional Search & Filter Bar */}
-      <div ref={searchRef} className="relative z-[1100] w-full">
+      <div ref={searchRef} className="relative z-[1100] w-full shrink-0">
         <div className="flex items-center gap-2 rounded-xl border border-slate-700/80 bg-slate-900/95 p-2 shadow-lg backdrop-blur-md">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-cyan-400" />
@@ -171,8 +171,8 @@ export const StationMap: React.FC = () => {
         )}
       </div>
 
-      {/* Map Container Viewport (Free Global Pan/Zoom without bounds locks) */}
-      <div className="relative flex-1 min-h-[460px] w-full rounded-2xl overflow-hidden border border-slate-800/90 bg-slate-900 shadow-xl">
+      {/* Map Container Viewport */}
+      <div className="relative flex-1 w-full rounded-2xl overflow-hidden border border-slate-800/90 bg-slate-900 shadow-xl min-h-[500px] flex flex-col">
         <div className="absolute top-3 left-3 z-[1000] flex items-center space-x-2 bg-slate-950/85 backdrop-blur-md px-3 py-1.5 rounded-lg border border-slate-800 text-xs">
           <span className="h-2 w-2 rounded-full bg-cyan-400 animate-pulse" />
           <span className="font-bold text-slate-200">National Weather Service</span>
@@ -183,7 +183,8 @@ export const StationMap: React.FC = () => {
           center={INITIAL_CENTER}
           zoom={INITIAL_ZOOM}
           scrollWheelZoom={true}
-          className="h-full w-full min-h-[460px]"
+          style={{ height: '100%', width: '100%', minHeight: '500px' }}
+          className="h-full w-full min-h-[500px] flex-1"
         >
           <MapPanController targetStation={selectedStation} />
 

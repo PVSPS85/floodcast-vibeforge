@@ -135,7 +135,7 @@ export const INITIAL_ALERTS: Alert[] = [
     station_id: '02087500',
     station_name: 'Neuse River near Clayton',
     river: 'Neuse River',
-    severity: 'warning',
+    severity: 'severe',
     timestamp: '42 min ago',
     message: 'Rapid quickflow accumulation following 68mm convective precipitation cell.',
     predicted_discharge: 12800,
