@@ -1,0 +1,24 @@
+# Slide Blueprint: FloodCast Pitch Deck (3-5 Slides)
+
+### Slide 1: Problem Statement & Objectives
+- **Headline:** Real-Time River Discharge Forecasting for Flood Mitigation
+- **Goal:** Accurately predict peak daily discharge (`discharge_cfs`) across multiple river stations[cite: 3].
+- **Key Challenges:** Non-linear hydrological lag effects, sudden extreme rainfall events, zero-leakage temporal requirements[cite: 3, 6].
+
+### Slide 2: Data & Feature Engineering Pipeline
+- **Inputs:** Historical river discharge, precipitation, temperature, and watershed metadata[cite: 3].
+- **Key Features:** Rolling precipitation windows (2–14 days), lagged soil moisture, and catchment interaction ratios[cite: 3].
+- **Validation:** Strict chronological holdout splits to mimic real-world forecasting[cite: 6].
+
+### Slide 3: Model Architecture & Evaluation
+- **Models Used:** Ensemble of CatBoost and LightGBM regressors[cite: 6].
+- **Post-Processing:** Non-negative clipping (`discharge_cfs >= 0`)[cite: 6].
+- **Metric Optimization:** Balanced target weighting (RMSE 40%, Extreme Event RMSE 30%, MAE 20%, R² 10%)[cite: 5].
+
+### Slide 4: Results, Validation & Output Compliance
+- **Performance Highlights:** Validation RMSE, MAE, and $R^2$ scores across holdout test dates[cite: 5].
+- **Integrity Verification:** 100% automated assertion pass for `predictions.csv` (zero nulls, non-negative bounds)[cite: 4, 6].
+
+### Slide 5: Limitations & Future Enhancements
+- **Current Limitations:** Dependence on accurate regional rainfall input accuracy[cite: 3].
+- **Next Steps:** Incorporating satellite-derived snowpack melt features and spatial graph neural networks (GNNs).

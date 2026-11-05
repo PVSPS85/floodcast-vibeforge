@@ -1,0 +1,16 @@
+# Git and OS metadata
+.git/
+.gitignore
+.DS_Store
+
+# Virtual environments & caches
+venv/
+.venv/
+__pycache__/
+*.py[cod]
+*$py.class
+notebooks/.ipynb_checkpoints/
+
+# Data files (keep sample_submission.csv as template)
+data/*.csv
+!data/sample_submission.csv
