@@ -12,12 +12,23 @@ import {
 import 'leaflet/dist/leaflet.css';
 import { useStationStore } from '@/store/useStationStore';
 import { Station } from '@/types';
-import { formatCFS, getStatusColor } from '@/lib/utils';
+import { formatCFS } from '@/lib/utils';
 import { Search, X, MapPin, Compass } from 'lucide-react';
 
 // Initial geographic center and zoom focused on the United States
 const INITIAL_CENTER: [number, number] = [39.8283, -98.5795];
-const INITIAL_ZOOM = 4;
+const INITIAL_ZOOM = 5;
+
+// Helper function to return severity color based on discharge_cfs
+export function getSeverityColor(discharge_cfs: number): string {
+  if (discharge_cfs < 15000) {
+    return '#00BFFF'; // Normal/Blue
+  } else if (discharge_cfs < 35000) {
+    return '#FFA500'; // High-Surge/Amber
+  } else {
+    return '#FF0033'; // Dangerous/Red
+  }
+}
 
 // Map controller to execute flyTo smoothly when station changes
 const MapPanController: React.FC<{ targetStation: Station | null }> = ({
@@ -28,7 +39,6 @@ const MapPanController: React.FC<{ targetStation: Station | null }> = ({
 
   useEffect(() => {
     if (!targetStation) return;
-    // Fly to the marker if station changed
     if (prevIdRef.current !== targetStation.station_id) {
       prevIdRef.current = targetStation.station_id;
       map.flyTo([targetStation.lat, targetStation.lon], 8, {
@@ -63,8 +73,9 @@ export const StationMap: React.FC = () => {
   const filteredStations = stations.filter((s) => {
     const q = query.toLowerCase().trim();
     if (!q) return true;
+    const name = ((s as unknown as { station_name?: string }).station_name ?? s.name).toLowerCase();
     return (
-      s.name.toLowerCase().includes(q) ||
+      name.includes(q) ||
       s.state.toLowerCase() === q ||
       s.state.toLowerCase().includes(q) ||
       s.river.toLowerCase().includes(q) ||
@@ -74,7 +85,8 @@ export const StationMap: React.FC = () => {
 
   const handleSelectStation = (station: Station) => {
     setSelectedStation(station);
-    setQuery(`${station.name} (${station.state})`);
+    const stationName = (station as unknown as { station_name?: string }).station_name ?? station.name;
+    setQuery(`${stationName} (${station.state})`);
     setIsOpen(false);
   };
 
@@ -98,7 +110,7 @@ export const StationMap: React.FC = () => {
                 setIsOpen(true);
               }}
               onFocus={() => setIsOpen(true)}
-              placeholder="Search 50 USGS gauges by station name, state (e.g. MO, NC, CA), or ID..."
+              placeholder="Search USGS gauges by station name, state (e.g. MO, NC, CA), or ID..."
               className="w-full rounded-lg border border-slate-800 bg-slate-950/80 py-2 pl-9 pr-9 text-xs font-medium text-slate-100 placeholder:text-slate-500 outline-none transition focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
             />
             {query && (
@@ -113,7 +125,7 @@ export const StationMap: React.FC = () => {
 
           <div className="hidden sm:flex items-center space-x-1.5 px-2 text-[11px] font-mono text-slate-400 border-l border-slate-800">
             <Compass className="h-3.5 w-3.5 text-cyan-400" />
-            <span>NWS AHPS Telemetry</span>
+            <span>Telemetry Dashboard</span>
           </div>
         </div>
 
@@ -129,7 +141,14 @@ export const StationMap: React.FC = () => {
               </div>
             ) : (
               filteredStations.map((station) => {
-                const statusStyle = getStatusColor(station.status);
+                const discharge_cfs =
+                  (station as unknown as { discharge_cfs?: number }).discharge_cfs ??
+                  station.current_discharge_cfs ??
+                  0;
+                const station_name =
+                  (station as unknown as { station_name?: string }).station_name ??
+                  station.name;
+                const markerColor = getSeverityColor(discharge_cfs);
                 const isSelected = station.station_id === selectedStation.station_id;
 
                 return (
@@ -143,9 +162,9 @@ export const StationMap: React.FC = () => {
                     }`}
                   >
                     <div className="flex items-center space-x-2 truncate pr-2">
-                      <MapPin className="h-3.5 w-3.5 shrink-0 text-cyan-400" />
+                      <MapPin className="h-3.5 w-3.5 shrink-0" style={{ color: markerColor }} />
                       <div className="truncate">
-                        <span className="font-bold text-white">{station.name}</span>
+                        <span className="font-bold text-white">{station_name}</span>
                         <span className="ml-1.5 text-[10px] text-slate-400 font-mono">
                           [{station.state}] &bull; #{station.station_id}
                         </span>
@@ -154,13 +173,8 @@ export const StationMap: React.FC = () => {
                     </div>
 
                     <div className="flex items-center space-x-2 shrink-0">
-                      <span className="font-mono text-[11px] text-slate-300">
-                        {formatCFS(station.current_discharge_cfs)}
-                      </span>
-                      <span
-                        className={`rounded px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider ${statusStyle.bg} ${statusStyle.text} border ${statusStyle.border}`}
-                      >
-                        {station.status}
+                      <span className="font-mono text-[11px] font-semibold" style={{ color: markerColor }}>
+                        {formatCFS(discharge_cfs)}
                       </span>
                     </div>
                   </button>
@@ -175,8 +189,8 @@ export const StationMap: React.FC = () => {
       <div className="relative flex-1 w-full rounded-2xl overflow-hidden border border-slate-800/90 bg-slate-900 shadow-xl min-h-[500px] flex flex-col">
         <div className="absolute top-3 left-3 z-[1000] flex items-center space-x-2 bg-slate-950/85 backdrop-blur-md px-3 py-1.5 rounded-lg border border-slate-800 text-xs">
           <span className="h-2 w-2 rounded-full bg-cyan-400 animate-pulse" />
-          <span className="font-bold text-slate-200">National Weather Service</span>
-          <span className="text-slate-400">&bull; Global Pan &amp; Zoom Active</span>
+          <span className="font-bold text-slate-200">High-Resolution Satellite Telemetry</span>
+          <span className="text-slate-400">&bull; Esri World Imagery</span>
         </div>
 
         <MapContainer
@@ -188,27 +202,32 @@ export const StationMap: React.FC = () => {
         >
           <MapPanController targetStation={selectedStation} />
 
-          {/* Esri World Topo Map (Official NWS Topographic Basemap) */}
+          {/* High-Resolution Esri World Imagery Satellite Map */}
           <TileLayer
-            attribution='&copy; <a href="https://www.esri.com/">Esri</a> &mdash; Esri, DeLorme, NAVTEQ, TomTom, USGS, NPS'
-            url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}"
+            attribution='&copy; <a href="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer">Esri World Imagery</a> &mdash; Source: Esri, Maxar, Earthstar Geographics, and the GIS User Community'
+            url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
           />
 
           {stations.map((station) => {
-            const isSelected = station.station_id === selectedStation.station_id;
-            const statusStyle = getStatusColor(station.status);
+            const discharge_cfs =
+              (station as unknown as { discharge_cfs?: number }).discharge_cfs ??
+              station.current_discharge_cfs ??
+              0;
+            const station_name =
+              (station as unknown as { station_name?: string }).station_name ??
+              station.name;
+            const station_id = station.station_id;
+            const markerColor = getSeverityColor(discharge_cfs);
 
             return (
               <CircleMarker
                 key={station.station_id}
                 center={[station.lat, station.lon]}
-                radius={isSelected ? 11 : 6.5}
-                pathOptions={{
-                  color: isSelected ? '#ffffff' : statusStyle.hex,
-                  fillColor: statusStyle.hex,
-                  fillOpacity: isSelected ? 0.95 : 0.82,
-                  weight: isSelected ? 3 : 1.5,
-                }}
+                radius={12}
+                fillOpacity={0.8}
+                weight={3}
+                color={markerColor}
+                fillColor={markerColor}
                 eventHandlers={{
                   click: () => setSelectedStation(station),
                 }}
@@ -216,71 +235,59 @@ export const StationMap: React.FC = () => {
                 <Tooltip direction="top" offset={[0, -8]} opacity={0.95}>
                   <div className="text-xs font-sans">
                     <p className="font-bold text-slate-900">
-                      {station.name}, {station.state}
+                      {station_name}, {station.state}
                     </p>
                     <p className="text-slate-700">
-                      {station.river} &bull; Q: {formatCFS(station.current_discharge_cfs)}
+                      USGS #{station_id} &bull; Q: {formatCFS(discharge_cfs)}
                     </p>
                   </div>
                 </Tooltip>
 
-                {/* Professional NWS / USGS Station Popup */}
+                {/* Clean, Dark-Themed Popup */}
                 <Popup className="floodcast-popup">
-                  <div className="p-1 space-y-2 text-xs font-sans">
-                    {/* Header: Station & Location */}
+                  <div className="p-2 space-y-2 text-xs font-sans text-slate-100 bg-slate-900 rounded-lg min-w-[200px]">
                     <div className="border-b border-slate-700/80 pb-1.5">
-                      <div className="flex items-center justify-between mb-0.5">
-                        <span className="text-[10px] font-mono font-bold text-cyan-400 uppercase tracking-wider">
-                          USGS #{station.station_id}
-                        </span>
-                        <span
-                          className={`rounded px-1.5 py-0.2 text-[9px] font-bold uppercase ${statusStyle.bg} ${statusStyle.text} border ${statusStyle.border}`}
-                        >
-                          {station.status} stage
-                        </span>
-                      </div>
-                      <p className="font-bold text-white text-sm leading-tight">{station.name}</p>
-                      <p className="text-slate-300 text-xs font-medium mt-0.5">
-                        River: <span className="text-cyan-300 font-semibold">{station.river}</span> &bull; State: <span className="text-cyan-300 font-semibold">{station.state}</span>
+                      <p className="font-bold text-white text-sm leading-tight">
+                        {station_name}
                       </p>
-                    </div>
-
-                    {/* Hydrologic Measurements */}
-                    <div className="grid grid-cols-2 gap-2 text-[11px]">
-                      <div className="bg-slate-950/80 p-2 rounded border border-slate-800">
-                        <span className="text-slate-400 block text-[10px]">Observed Streamflow</span>
-                        <span className="font-bold text-emerald-400 text-xs">
-                          {formatCFS(station.current_discharge_cfs)}
+                      <div className="mt-0.5 flex items-center justify-between text-[11px] font-mono">
+                        <span className="text-cyan-400 font-semibold">
+                          USGS #{station_id}
                         </span>
-                      </div>
-                      <div className="bg-slate-950/80 p-2 rounded border border-slate-800">
-                        <span className="text-slate-400 block text-[10px]">CatBoost Peak Forecast</span>
-                        <span className="font-bold text-cyan-400 text-xs">
-                          {formatCFS(station.predicted_peak_cfs)}
+                        <span className="text-slate-400">
+                          {station.state}
                         </span>
                       </div>
                     </div>
 
-                    {/* Basin Characteristics */}
-                    <div className="grid grid-cols-2 gap-x-2 gap-y-1 text-[10px] text-slate-400 pt-0.5">
-                      <div>
-                        Drainage: <span className="text-slate-200 font-semibold">{station.drainage_area_sqmi.toLocaleString()} sq mi</span>
-                      </div>
-                      <div>
-                        Elevation: <span className="text-slate-200 font-semibold">{station.mean_elevation_ft.toLocaleString()} ft</span>
-                      </div>
-                      <div>
-                        Action: <span className="text-amber-300 font-semibold">{formatCFS(station.action_stage_cfs)}</span>
-                      </div>
-                      <div>
-                        Flood: <span className="text-rose-400 font-semibold">{formatCFS(station.flood_stage_cfs)}</span>
-                      </div>
+                    <div className="bg-slate-950/80 p-2 rounded border border-slate-800">
+                      <span className="text-slate-400 block text-[10px] uppercase font-bold tracking-wider">
+                        Current Discharge
+                      </span>
+                      <span
+                        className="font-mono font-bold text-sm"
+                        style={{ color: markerColor }}
+                      >
+                        {formatCFS(discharge_cfs)}
+                      </span>
                     </div>
 
-                    {/* Bottom CTA */}
-                    <div className="pt-1.5 border-t border-slate-800 flex justify-between items-center text-[10px] text-slate-500">
-                      <span>Coordinates: {station.lat.toFixed(2)}&deg;N, {Math.abs(station.lon).toFixed(2)}&deg;W</span>
-                      <span className="text-cyan-400 font-semibold">Active telemetry</span>
+                    <div className="flex items-center justify-between text-[10px] text-slate-400 pt-0.5">
+                      <span>Severity Status:</span>
+                      <span
+                        className="px-1.5 py-0.5 rounded font-bold uppercase text-[9px]"
+                        style={{
+                          backgroundColor: `${markerColor}22`,
+                          color: markerColor,
+                          border: `1px solid ${markerColor}66`,
+                        }}
+                      >
+                        {discharge_cfs < 15000
+                          ? 'Normal (<15k)'
+                          : discharge_cfs < 35000
+                          ? 'High-Surge'
+                          : 'Dangerous (≥35k)'}
+                      </span>
                     </div>
                   </div>
                 </Popup>
@@ -289,26 +296,22 @@ export const StationMap: React.FC = () => {
           })}
         </MapContainer>
 
-        {/* NWS AHPS River Stage Legend */}
+        {/* Dynamic Telemetry Severity Legend */}
         <div className="absolute bottom-3 right-3 z-[1000] bg-slate-950/92 backdrop-blur-md p-2.5 rounded-xl border border-slate-800 text-[11px] space-y-1.5 shadow-xl">
           <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-            NWS River Stage Key
+            Telemetry Severity
           </p>
           <div className="flex items-center space-x-2">
-            <span className="h-2.5 w-2.5 rounded-full bg-emerald-500" />
-            <span className="text-slate-300">Normal Flow</span>
+            <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: '#00BFFF' }} />
+            <span className="text-slate-300">Normal (&lt; 15,000 cfs)</span>
           </div>
           <div className="flex items-center space-x-2">
-            <span className="h-2.5 w-2.5 rounded-full bg-cyan-500" />
-            <span className="text-slate-300">Action / Advisory</span>
+            <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: '#FFA500' }} />
+            <span className="text-slate-300">High-Surge (15,000 – 35,000 cfs)</span>
           </div>
           <div className="flex items-center space-x-2">
-            <span className="h-2.5 w-2.5 rounded-full bg-amber-500" />
-            <span className="text-slate-300">Warning Stage</span>
-          </div>
-          <div className="flex items-center space-x-2">
-            <span className="h-2.5 w-2.5 rounded-full bg-rose-500 animate-pulse" />
-            <span className="text-slate-300 font-semibold text-rose-400">Flood Stage</span>
+            <span className="h-2.5 w-2.5 rounded-full animate-pulse" style={{ backgroundColor: '#FF0033' }} />
+            <span className="text-slate-300 font-semibold text-rose-400">Dangerous (&ge; 35,000 cfs)</span>
           </div>
         </div>
       </div>
