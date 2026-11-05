@@ -239,3 +239,10 @@ class FloodCastModel:
         if not isinstance(instance, cls):
             raise TypeError(f"Loaded object is of type {type(instance)}, expected {cls}.")
         return instance
+
+
+# FastAPI App instance export for uvicorn server
+try:
+    from src.api import app
+except Exception:
+    app = None
