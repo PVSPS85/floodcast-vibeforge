@@ -13,16 +13,11 @@ import 'leaflet/dist/leaflet.css';
 import { useStationStore } from '@/store/useStationStore';
 import { Station } from '@/types';
 import { formatCFS, getStatusColor } from '@/lib/utils';
-import { Search, X, MapPin, ChevronDown, Compass, ExternalLink } from 'lucide-react';
+import { Search, X, MapPin, Compass } from 'lucide-react';
 
-// Geographic center of the Continental United States (CONUS)
-const US_CENTER: [number, number] = [39.8283, -98.5795];
+// Initial geographic center and zoom focused on the United States
+const INITIAL_CENTER: [number, number] = [39.8283, -98.5795];
 const INITIAL_ZOOM = 4;
-// Bounds to constrain panning strictly around the United States
-const US_BOUNDS: [[number, number], [number, number]] = [
-  [18.0, -132.0], // Southwest coordinate
-  [54.0, -62.0],  // Northeast coordinate
-];
 
 // Map controller to execute flyTo smoothly when station changes
 const MapPanController: React.FC<{ targetStation: Station | null }> = ({
@@ -176,21 +171,17 @@ export const StationMap: React.FC = () => {
         )}
       </div>
 
-      {/* Map Container Viewport */}
+      {/* Map Container Viewport (Free Global Pan/Zoom without bounds locks) */}
       <div className="relative flex-1 min-h-[460px] w-full rounded-2xl overflow-hidden border border-slate-800/90 bg-slate-900 shadow-xl">
-        {/* Top Badges */}
         <div className="absolute top-3 left-3 z-[1000] flex items-center space-x-2 bg-slate-950/85 backdrop-blur-md px-3 py-1.5 rounded-lg border border-slate-800 text-xs">
           <span className="h-2 w-2 rounded-full bg-cyan-400 animate-pulse" />
           <span className="font-bold text-slate-200">National Weather Service</span>
-          <span className="text-slate-400">&bull; CONUS Hydrologic Network</span>
+          <span className="text-slate-400">&bull; Global Pan &amp; Zoom Active</span>
         </div>
 
         <MapContainer
-          center={US_CENTER}
+          center={INITIAL_CENTER}
           zoom={INITIAL_ZOOM}
-          minZoom={3}
-          maxBounds={US_BOUNDS}
-          maxBoundsViscosity={0.9}
           scrollWheelZoom={true}
           className="h-full w-full min-h-[460px]"
         >
@@ -262,7 +253,7 @@ export const StationMap: React.FC = () => {
                         </span>
                       </div>
                       <div className="bg-slate-950/80 p-2 rounded border border-slate-800">
-                        <span className="text-slate-400 block text-[10px]">CatBoost Peak Peak</span>
+                        <span className="text-slate-400 block text-[10px]">CatBoost Peak Forecast</span>
                         <span className="font-bold text-cyan-400 text-xs">
                           {formatCFS(station.predicted_peak_cfs)}
                         </span>
