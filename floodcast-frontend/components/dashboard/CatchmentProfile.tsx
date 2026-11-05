@@ -8,42 +8,51 @@ import { motion } from 'framer-motion';
 export const CatchmentProfile: React.FC = () => {
   const { selectedStation } = useStationStore();
 
+  const drainageArea = selectedStation?.drainage_area_sqmi ?? 0;
+  const meanElevation = selectedStation?.mean_elevation_ft ?? 0;
+  const slope = selectedStation?.slope_pct ?? 0;
+  const forestCover = selectedStation?.forest_cover_pct ?? 0;
+
+  const currentQ = selectedStation?.current_discharge_cfs ?? 0;
+  const floodStage = selectedStation?.flood_stage_cfs || 1;
+  const capacityPct = Math.min(100, (currentQ / floodStage) * 100);
+
   const attributes = [
     {
-      label: 'Drainage Catchment Area',
-      value: `${selectedStation.drainage_area_sqmi.toLocaleString()}`,
+      label: 'Drainage Area',
+      value: drainageArea > 0 ? drainageArea.toLocaleString() : 'N/A',
       unit: 'sq mi',
       icon: Maximize2,
       color: 'text-cyan-400',
       bgColor: 'bg-cyan-500/10',
-      description: 'Total watershed area contributing runoff to this gauge',
+      description: 'Total watershed area contributing storm runoff to this gauge',
     },
     {
       label: 'Mean Basin Elevation',
-      value: `${selectedStation.mean_elevation_ft.toLocaleString()}`,
+      value: meanElevation > 0 ? meanElevation.toLocaleString() : 'N/A',
       unit: 'ft above sea',
       icon: Mountain,
       color: 'text-indigo-400',
       bgColor: 'bg-indigo-500/10',
-      description: 'Controls orographic precipitation and snowmelt timing',
+      description: 'Drives orographic precipitation gradient and snowpack timing',
     },
     {
-      label: 'Catchment Mean Slope',
-      value: `${selectedStation.slope_pct}`,
-      unit: '% grade',
+      label: 'Basin Mean Slope',
+      value: slope > 0 ? `${slope}%` : 'N/A',
+      unit: 'grade',
       icon: Compass,
       color: 'text-amber-400',
       bgColor: 'bg-amber-500/10',
-      description: 'Steeper slopes accelerate runoff response and time-to-peak',
+      description: 'Steeper gradients accelerate hydrograph peak arrival time',
     },
     {
       label: 'Forest Canopy Cover',
-      value: `${selectedStation.forest_cover_pct}`,
-      unit: '% forested',
+      value: forestCover > 0 ? `${forestCover}%` : 'N/A',
+      unit: 'forested',
       icon: Trees,
       color: 'text-emerald-400',
       bgColor: 'bg-emerald-500/10',
-      description: 'Increases rainfall interception and attenuates flash surges',
+      description: 'Vegetative interception buffers antecedent soil moisture saturation',
     },
   ];
 
@@ -52,7 +61,7 @@ export const CatchmentProfile: React.FC = () => {
       initial={{ opacity: 0, y: 15 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, delay: 0.1 }}
-      className="rounded-2xl border border-slate-800/80 bg-slate-900/70 p-5 backdrop-blur-md shadow-xl flex flex-col justify-between"
+      className="rounded-2xl border border-slate-800/80 bg-slate-900/70 p-5 backdrop-blur-md shadow-xl flex flex-col justify-between h-full"
     >
       <div>
         <div className="flex items-center justify-between mb-4">
@@ -61,13 +70,13 @@ export const CatchmentProfile: React.FC = () => {
             <h3 className="text-base font-bold text-slate-100">Basin Physiographic Drivers</h3>
           </div>
           <span className="text-[10px] font-mono text-slate-400 bg-slate-800/80 px-2 py-0.5 rounded border border-slate-700">
-            USGS StreamStats
+            USGS #{selectedStation.station_id}
           </span>
         </div>
 
         <p className="text-xs text-slate-400 mb-4">
-          Static hydrological catchment characteristics fed directly into the CatBoost regressor for station{' '}
-          <span className="text-slate-200 font-semibold">{selectedStation.station_id}</span>.
+          Static hydrological catchment characteristics fed directly into CatBoost ML inference for{' '}
+          <span className="text-slate-200 font-semibold">{selectedStation.name}</span>.
         </p>
 
         <div className="grid grid-cols-2 gap-3">
@@ -95,33 +104,25 @@ export const CatchmentProfile: React.FC = () => {
         </div>
       </div>
 
-      {/* Hydraulic Capacity Bar */}
+      {/* Dynamic Hydraulic Capacity Bar */}
       <div className="mt-4 pt-3 border-t border-slate-800/80">
         <div className="flex justify-between items-center text-xs mb-1.5">
-          <span className="text-slate-400">Current / Flood Capacity</span>
-          <span className="font-bold text-slate-200">
-            {((selectedStation.current_discharge_cfs / selectedStation.flood_stage_cfs) * 100).toFixed(1)}%
-          </span>
+          <span className="text-slate-400">Current Flow / Flood Capacity</span>
+          <span className="font-bold text-slate-200">{capacityPct.toFixed(1)}%</span>
         </div>
         <div className="h-2 w-full rounded-full bg-slate-800 overflow-hidden">
           <div
             className={`h-full rounded-full transition-all duration-500 ${
-              selectedStation.status === 'flood'
+              capacityPct >= 95
                 ? 'bg-rose-500'
-                : selectedStation.status === 'warning'
+                : capacityPct >= 75
                 ? 'bg-amber-500'
                 : 'bg-cyan-500'
             }`}
-            style={{
-              width: `${Math.min(
-                100,
-                (selectedStation.current_discharge_cfs / selectedStation.flood_stage_cfs) * 100
-              )}%`,
-            }}
+            style={{ width: `${capacityPct}%` }}
           />
         </div>
       </div>
     </motion.div>
   );
 };
-
