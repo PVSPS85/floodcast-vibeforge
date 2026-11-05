@@ -15,23 +15,46 @@ export interface TimeseriesPoint {
 }
 
 /**
- * Resolves path to datasets regardless of whether Next.js
- * is launched from the workspace root or from floodcast-frontend.
+ * Resolves path to datasets across Vercel serverless lambdas,
+ * Next.js public bundle, and local developer environments.
  */
 function resolveFilePath(...segments: string[]): string {
-  const directPath = path.resolve(process.cwd(), ...segments);
-  if (fs.existsSync(directPath)) return directPath;
+  const fileName = segments[segments.length - 1];
 
-  const parentPath = path.resolve(process.cwd(), '..', ...segments);
-  if (fs.existsSync(parentPath)) return parentPath;
+  const candidates = [
+    // 1. Next.js public bundle (bundled by Vercel in production)
+    path.resolve(process.cwd(), 'public', 'data', fileName),
+    path.resolve(process.cwd(), 'public', fileName),
+    path.resolve(process.cwd(), 'public', ...segments),
+    // 2. Relative to floodcast-frontend/public (when running from root)
+    path.resolve(process.cwd(), 'floodcast-frontend', 'public', 'data', fileName),
+    path.resolve(process.cwd(), 'floodcast-frontend', 'public', fileName),
+    path.resolve(process.cwd(), 'floodcast-frontend', 'public', ...segments),
+    // 3. Local data folder
+    path.resolve(process.cwd(), 'data', fileName),
+    path.resolve(process.cwd(), ...segments),
+    // 4. Parent root folder (local dev environment)
+    path.resolve(process.cwd(), '..', 'data', fileName),
+    path.resolve(process.cwd(), '..', fileName),
+    path.resolve(process.cwd(), '..', ...segments),
+    path.resolve(process.cwd(), '..', 'floodcast-frontend', 'public', 'data', fileName),
+    path.resolve(process.cwd(), '..', 'floodcast-frontend', 'public', fileName),
+  ];
 
-  return directPath;
+  for (const candidate of candidates) {
+    if (fs.existsSync(candidate)) {
+      return candidate;
+    }
+  }
+
+  // Fallback to standard public data location
+  return path.resolve(process.cwd(), 'public', 'data', fileName);
 }
 
 /**
  * GET /api/stations/[station_id]
  *
- * Reads real historical USGS telemetry from data/train.csv and
+ * Reads real historical USGS telemetry from train.csv and
  * ML discharge forecasts from predictions.csv, filters for the
  * requested station_id, and combines them into an ordered time-series.
  */
@@ -51,11 +74,39 @@ export async function GET(
 
     const cleanStationId = decodeURIComponent(station_id).trim();
 
-    const trainPath = resolveFilePath('data', 'train.csv');
+    const trainPath = resolveFilePath('train.csv');
     const predPath = resolveFilePath('predictions.csv');
-    const testPath = resolveFilePath('data', 'test.csv');
+    const testPath = resolveFilePath('test.csv');
 
+    // Resilient fallback for serverless environments (Vercel)
     if (!fs.existsSync(trainPath) || !fs.existsSync(predPath)) {
+      const timeseriesJsonPath = resolveFilePath('timeseries.json');
+      if (fs.existsSync(timeseriesJsonPath)) {
+        try {
+          const raw = fs.readFileSync(timeseriesJsonPath, 'utf-8');
+          const jsonMap = JSON.parse(raw);
+          const stationPoints = jsonMap[cleanStationId];
+          if (stationPoints && Array.isArray(stationPoints)) {
+            const formatted: TimeseriesPoint[] = stationPoints.map((pt: any) => ({
+              date: pt.date,
+              discharge_cfs: Math.max(0, parseFloat(pt.discharge_cfs) || 0),
+              pred_discharge_cfs: Math.max(0, parseFloat(pt.pred_discharge_cfs) || 0),
+              precipitation_mm: parseFloat(pt.precipitation_mm) || 0,
+              temp_max_c: parseFloat(pt.temp_max_c) || 0,
+              temp_min_c: parseFloat(pt.temp_min_c) || 0,
+              soil_moisture: parseFloat(pt.soil_moisture) || 0,
+              is_forecast: true,
+            }));
+            const url = new URL(request.url);
+            const daysParam = url.searchParams.get('days');
+            const result = daysParam ? formatted.slice(-parseInt(daysParam, 10)) : formatted;
+            return NextResponse.json(result, { status: 200 });
+          }
+        } catch (e) {
+          console.warn('Error reading timeseries.json fallback on Vercel:', e);
+        }
+      }
+
       return NextResponse.json(
         {
           error: 'Required dataset files not found',
@@ -99,7 +150,7 @@ export async function GET(
 
     const timeseries: TimeseriesPoint[] = [];
 
-    // 1. Stream & filter historical data from data/train.csv
+    // 1. Stream & filter historical data from train.csv
     const rlTrain = readline.createInterface({
       input: fs.createReadStream(trainPath, { encoding: 'utf-8' }),
       crlfDelay: Infinity,
@@ -171,6 +222,34 @@ export async function GET(
     }
 
     if (timeseries.length === 0) {
+      // Fallback check to timeseries.json if CSV had no matching lines
+      const timeseriesJsonPath = resolveFilePath('timeseries.json');
+      if (fs.existsSync(timeseriesJsonPath)) {
+        try {
+          const raw = fs.readFileSync(timeseriesJsonPath, 'utf-8');
+          const jsonMap = JSON.parse(raw);
+          const stationPoints = jsonMap[cleanStationId];
+          if (stationPoints && Array.isArray(stationPoints)) {
+            const formatted: TimeseriesPoint[] = stationPoints.map((pt: any) => ({
+              date: pt.date,
+              discharge_cfs: Math.max(0, parseFloat(pt.discharge_cfs) || 0),
+              pred_discharge_cfs: Math.max(0, parseFloat(pt.pred_discharge_cfs) || 0),
+              precipitation_mm: parseFloat(pt.precipitation_mm) || 0,
+              temp_max_c: parseFloat(pt.temp_max_c) || 0,
+              temp_min_c: parseFloat(pt.temp_min_c) || 0,
+              soil_moisture: parseFloat(pt.soil_moisture) || 0,
+              is_forecast: true,
+            }));
+            const url = new URL(request.url);
+            const daysParam = url.searchParams.get('days');
+            const result = daysParam ? formatted.slice(-parseInt(daysParam, 10)) : formatted;
+            return NextResponse.json(result, { status: 200 });
+          }
+        } catch {
+          // ignore fallback error
+        }
+      }
+
       return NextResponse.json(
         {
           error: `No records found for station_id '${cleanStationId}'`,
@@ -197,4 +276,3 @@ export async function GET(
     );
   }
 }
-

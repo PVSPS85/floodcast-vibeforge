@@ -1,0 +1,51 @@
+station_id,station_name,latitude,longitude,state,river_name
+01100000,"Merrimack River at Lowell, MA",42.6417,-71.3283,MA,Merrimack River
+01184000,"Connecticut River at Thompsonville, CT",41.9861,-72.6056,CT,Connecticut River
+01335754,"Hudson River at Albany, NY",42.6526,-73.7562,NY,Hudson River
+01434000,"Delaware River at Montague, NJ",41.3106,-74.7978,NJ,Delaware River
+01463500,"Delaware River at Trenton, NJ",40.2217,-74.7778,NJ,Delaware River
+01570500,"Susquehanna River at Harrisburg, PA",40.2528,-76.8856,PA,Susquehanna River
+01643000,"Shenandoah River at Millville, WV",39.3039,-77.7836,WV,Shenandoah River
+01646500,"Potomac River near Washington, DC",38.9498,-77.1276,DC,Potomac River
+02087500,"Neuse River near Clayton, NC",35.6481,-78.4117,NC,Neuse River
+02131000,"Pee Dee River at Peedee, SC",34.2044,-79.5492,SC,Pee Dee River
+02169500,"Santee River near Pineville, SC",33.4561,-80.1436,SC,Santee River
+02203000,"Ogeechee River near Eden, GA",32.1694,-81.4283,GA,Ogeechee River
+02320500,"Suwannee River near Branford, FL",29.9556,-82.9292,FL,Suwannee River
+02339500,"Chattahoochee River near Whitesburg, GA",33.5819,-84.8967,GA,Chattahoochee River
+02428400,"Alabama River near Montgomery, AL",32.4103,-86.4069,AL,Alabama River
+02470500,"Pascagoula River at Merrill, MS",30.9786,-88.7231,MS,Pascagoula River
+03085000,"Monongahela River at Braddock, PA",40.4039,-79.8667,PA,Monongahela River
+03216000,"Ohio River at Greenup Dam, KY",38.6472,-82.8597,KY,Ohio River
+03335500,"Wabash River at Covington, IN",40.1417,-87.4042,IN,Wabash River
+03377500,"White River at Petersburg, IN",38.4897,-87.2792,IN,White River
+03432415,"Cumberland River at Nashville, TN",36.1667,-86.7722,TN,Cumberland River
+03538000,"French Broad River near Knoxville, TN",35.9611,-83.8444,TN,French Broad River
+040851385,"Fox River at Oshkosh, WI",44.0208,-88.5444,WI,Fox River
+04193500,"Maumee River at Waterville, OH",41.5,-83.7139,OH,Maumee River
+05344500,"Mississippi River at Prescott, WI",44.7478,-92.8028,WI,Mississippi River
+05420500,"Mississippi River at Clinton, IA",41.7778,-90.2528,IA,Mississippi River
+05527500,"Kankakee River near Wilmington, IL",41.3167,-88.1667,IL,Kankakee River
+05586100,"Illinois River at Valley City, IL",39.7111,-90.6486,IL,Illinois River
+06486000,"Big Sioux River at Akron, IA",42.825,-96.5583,IA,Big Sioux River
+06610000,"Missouri River at Omaha, NE",41.2583,-95.9222,NE,Missouri River
+06807000,"Platte River at Louisville, NE",41.0083,-96.1611,NE,Platte River
+06893000,"Kansas River at Desoto, KS",38.9833,-94.9667,KS,Kansas River
+06934500,"Missouri River at Hermann, MO",38.7111,-91.4389,MO,Missouri River
+07010000,"Mississippi River at St. Louis, MO",38.6292,-90.1798,MO,Mississippi River
+07144100,"Arkansas River near Wichita, KS",37.6694,-97.35,KS,Arkansas River
+07263450,"Arkansas River at Murray Dam, AR",34.7878,-92.3556,AR,Arkansas River
+08066500,"Trinity River at Romayor, TX",30.4267,-94.8517,TX,Trinity River
+08116650,"Brazos River at Richmond, TX",29.5819,-95.7533,TX,Brazos River
+08158000,"Colorado River at Austin, TX",30.2467,-97.7181,TX,Colorado River
+08162000,"Colorado River near Bay City, TX",28.9717,-95.9967,TX,Colorado River
+08181800,"San Antonio River near Elmendorf, TX",29.2389,-98.4111,TX,San Antonio River
+08447410,"Pecos River near Langtry, TX",29.8028,-101.5306,TX,Pecos River
+09058000,"Colorado River near Kremmling, CO",40.0389,-106.4028,CO,Colorado River
+09095500,"Colorado River near Cameo, CO",39.1917,-108.3194,CO,Colorado River
+09180500,"Colorado River near Cisco, UT",38.81,-109.3042,UT,Colorado River
+09380000,"Colorado River at Lees Ferry, AZ",36.8647,-111.5878,AZ,Colorado River
+09522000,"Colorado River at Northerly Boundary, AZ",32.7214,-114.7967,AZ,Colorado River
+10171000,"Jordan River at Salt Lake City, UT",40.7306,-111.9361,UT,Jordan River
+11447650,"Sacramento River at Freeport, CA",38.4553,-121.5008,CA,Sacramento River
+12472800,"Columbia River below Priest Rapids Dam, WA",46.6389,-119.9056,WA,Columbia River
