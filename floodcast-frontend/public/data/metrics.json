@@ -1,0 +1,11 @@
+{
+  "overall_rmse": 4820.5,
+  "extreme_rmse": 8412.3,
+  "overall_mae": 2845.1,
+  "overall_r2": 0.916,
+  "composite_score": 0.916,
+  "training_samples": 219150,
+  "test_samples": 36500,
+  "peak_weight": 2.5,
+  "algorithm": "CatBoost Gradient Boosted Trees (Sample-Weighted Top 15% Peaks)"
+}

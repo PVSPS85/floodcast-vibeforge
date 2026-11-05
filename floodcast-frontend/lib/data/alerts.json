@@ -1,0 +1,98 @@
+[
+  {
+    "id": "alt-01",
+    "station_id": "01100000",
+    "station_name": "Merrimack River at Lowell, MA",
+    "river": "Merrimack River",
+    "severity": "extreme",
+    "timestamp": "14 min ago",
+    "message": "CatBoost ML predicts discharge exceedance reaching 51,852 cfs following heavy precipitation and elevated soil moisture.",
+    "predicted_discharge": 51852.4,
+    "threshold_cfs": 33093.7,
+    "hours_to_peak": 24
+  },
+  {
+    "id": "alt-02",
+    "station_id": "01184000",
+    "station_name": "Connecticut River at Thompsonville, CT",
+    "river": "Connecticut River",
+    "severity": "severe",
+    "timestamp": "28 min ago",
+    "message": "CatBoost ML predicts discharge exceedance reaching 47,874 cfs following heavy precipitation and elevated soil moisture.",
+    "predicted_discharge": 47873.8,
+    "threshold_cfs": 31400.0,
+    "hours_to_peak": 30
+  },
+  {
+    "id": "alt-03",
+    "station_id": "01335754",
+    "station_name": "Hudson River at Albany, NY",
+    "river": "Hudson River",
+    "severity": "extreme",
+    "timestamp": "42 min ago",
+    "message": "CatBoost ML predicts discharge exceedance reaching 21,666 cfs following heavy precipitation and elevated soil moisture.",
+    "predicted_discharge": 21665.9,
+    "threshold_cfs": 21600.0,
+    "hours_to_peak": 36
+  },
+  {
+    "id": "alt-04",
+    "station_id": "01434000",
+    "station_name": "Delaware River at Montague, NJ",
+    "river": "Delaware River",
+    "severity": "severe",
+    "timestamp": "56 min ago",
+    "message": "CatBoost ML predicts discharge exceedance reaching 12,188 cfs following heavy precipitation and elevated soil moisture.",
+    "predicted_discharge": 12187.6,
+    "threshold_cfs": 9324.0,
+    "hours_to_peak": 42
+  },
+  {
+    "id": "alt-05",
+    "station_id": "01463500",
+    "station_name": "Delaware River at Trenton, NJ",
+    "river": "Delaware River",
+    "severity": "extreme",
+    "timestamp": "70 min ago",
+    "message": "CatBoost ML predicts discharge exceedance reaching 51,284 cfs following heavy precipitation and elevated soil moisture.",
+    "predicted_discharge": 51283.7,
+    "threshold_cfs": 37272.0,
+    "hours_to_peak": 48
+  },
+  {
+    "id": "alt-06",
+    "station_id": "01570500",
+    "station_name": "Susquehanna River at Harrisburg, PA",
+    "river": "Susquehanna River",
+    "severity": "severe",
+    "timestamp": "84 min ago",
+    "message": "CatBoost ML predicts discharge exceedance reaching 83,492 cfs following heavy precipitation and elevated soil moisture.",
+    "predicted_discharge": 83491.7,
+    "threshold_cfs": 67270.0,
+    "hours_to_peak": 54
+  },
+  {
+    "id": "alt-07",
+    "station_id": "01643000",
+    "station_name": "Shenandoah River at Millville, WV",
+    "river": "Shenandoah River",
+    "severity": "extreme",
+    "timestamp": "98 min ago",
+    "message": "CatBoost ML predicts discharge exceedance reaching 8,494 cfs following heavy precipitation and elevated soil moisture.",
+    "predicted_discharge": 8493.8,
+    "threshold_cfs": 4417.2,
+    "hours_to_peak": 60
+  },
+  {
+    "id": "alt-08",
+    "station_id": "01646500",
+    "station_name": "Potomac River near Washington, DC",
+    "river": "Potomac River",
+    "severity": "extreme",
+    "timestamp": "112 min ago",
+    "message": "CatBoost ML predicts discharge exceedance reaching 47,865 cfs following heavy precipitation and elevated soil moisture.",
+    "predicted_discharge": 47864.9,
+    "threshold_cfs": 44444.0,
+    "hours_to_peak": 66
+  }
+]
